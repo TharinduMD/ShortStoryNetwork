@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShortStoryNetwork.Core;
 using ShortStoryNetwork.Data;
 using ShortStoryNetwork.Repository.Interfaces;
@@ -23,7 +24,7 @@ namespace ShortStoryNetwork.Repository
         }
 
         //POST
-        public bool AddStatVowel(string post) 
+        public bool AddStatVowel(string post)
         {
             var success = false;
             try
@@ -34,7 +35,7 @@ namespace ShortStoryNetwork.Repository
 
                 var stateVowel = new StatVowel
                 {
-                    Id = "VS01",
+                    Id = "VS02",
                     Date = DateTime.Today,
                     SingleVowelCount = singleVowelCount,
                     PairVowelCount = pairVowelCount,
@@ -47,12 +48,12 @@ namespace ShortStoryNetwork.Repository
                 return success;
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e.StackTrace);
                 Message = "Error occured while saving";
                 throw;
-            }          
+            }
         }
 
         public bool UpdateStateVowel(string post)
@@ -86,6 +87,42 @@ namespace ShortStoryNetwork.Repository
             }
         }
 
+        public StatVowel GetStateVowelByDay(DateTime date)
+        {
+            StatVowel statVowel = null;
+            try
+            {
+                statVowel = _context.StatVowels.FirstOrDefault(x => x.Date.Date == date.Date);
+                return statVowel;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.StackTrace);
+                Message = "Error occured while retriving";
+                throw;
+            }
+        }
+
+        public List<UserInfo> GetUserInfoList(string searchField, string searchText)
+        {
+            var userInfo = new List<UserInfo>();
+            try
+            {
+                var sql = string.Empty;
+                if (!string.IsNullOrWhiteSpace(searchField))
+                    sql = $"Select * from dbo.UserInfo where {searchField} like '%{searchText}%' order by {searchField}";
+                else
+                    sql = "Select * from dbo.UserInfo";
+                userInfo = _context.UserInfos.FromSqlRaw(sql).ToList();
+            }
+            catch (Exception e)
+            {
+                Message = "Error occured";
+                _logger.LogError("Error occured when retriving " + e);
+            }
+            return userInfo;
+        }
+
         // Calculate single vowel in the word
         public int CalculateSingleVowels(string post)
         {
@@ -96,11 +133,11 @@ namespace ShortStoryNetwork.Repository
                 if (!string.IsNullOrEmpty(post))
                 {
                     string[] wordList = post.Split(' ');
-                    foreach(var word in wordList)
+                    foreach (var word in wordList)
                     {
-                        for(int i = 0; i+1 < word.Length; i++)
+                        for (int i = 0; i + 1 < word.Length; i++)
                         {
-                            if (vowels.Contains(char.ToUpper(word[i])) && !vowels.Contains(char.ToUpper(word[i+1])))
+                            if (vowels.Contains(char.ToUpper(word[i])) && !vowels.Contains(char.ToUpper(word[i + 1])))
                             {
                                 count++;
                             }

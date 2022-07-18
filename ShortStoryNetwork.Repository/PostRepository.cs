@@ -31,27 +31,27 @@ namespace ShortStoryNetwork.Repository
             {
                 if(post != null)
                 {
+
                     var postExists = _context.Posts.Where(x =>(x.Date).Date == DateTime.Today).ToList();
                     if(!postExists.Any()){
                         var insertToStateVowel = _statVowelRepository.AddStatVowel(post.Posts);
-                        Result = _statVowelRepository.Result;
-                        success = true;
                     }
                     else{
                         var updateStateVowel = _statVowelRepository.UpdateStateVowel(post.Posts);
-                        _context.Posts.Add(post);
-                        _context.SaveChanges();
-                        Result = post.PostId;
-                        success = true;
                     }
-
+                    _context.Posts.Add(post);
+                    _context.SaveChanges();
+                    Result = post.PostId;
+                    success = true;
                 }
-            }catch(Exception e)
+                return success;
+            }
+            catch(Exception e)
             {
                 _logger.LogError(e.StackTrace);
                 Message = "Error occured while saving";
+                throw;
             }
-            return success;
         }
     }
 }
