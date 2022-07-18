@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShortStoryNetwork.Core;
 using ShortStoryNetwork.Repository.Interfaces;
 using System;
@@ -7,12 +8,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace ShortStoryNetwork.Controllers
 {
     [Route("statvowel")]
     [ApiController]
+    [Authorize(policy: "Moderators")]
     public class StatVowelController : ControllerBase
     {
         private readonly IStatVowelRepository _statVowelRepository;
@@ -21,7 +21,7 @@ namespace ShortStoryNetwork.Controllers
             _statVowelRepository = statVowelRepository;
         }
 
-        [HttpGet]
+        [HttpGet("staticperday")]
         public IActionResult Get(DateTime date)
         {            
             try

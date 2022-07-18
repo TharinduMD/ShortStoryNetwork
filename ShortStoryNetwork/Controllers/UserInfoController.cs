@@ -9,8 +9,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace ShortStoryNetwork.Controllers
 {
     [Route("user")]
@@ -24,21 +22,35 @@ namespace ShortStoryNetwork.Controllers
             _userInfosRepository = userInfosRepository;
         }
 
-        //// GET all
-        //[HttpGet]
-        //public IEnumerable<UserInfo> Get()
-        //{
-        //    return;
-        //}
+        [HttpGet("writers")]
+        public IActionResult Get()
+        {
+            var writers = _userInfosRepository.GetWriters();
+            try
+            {
+                if (writers.Count > 0)
+                {
+                    var response = new ResponseObject
+                    {
+                        StatusCode = (int)HttpStatusCode.OK,
+                        Data = writers
+                    };
+                    return Ok(response);
+                }
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                var response = new ResponseObject
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Data = _userInfosRepository.Result,
+                    Error = new Error { Message = _userInfosRepository.Message }
+                };
+                return BadRequest(response);
+            }
+        }
 
-        //// GET by Id
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        // POST api/<UserInfoController>
         [HttpPost]
         public IActionResult Post(UserInfo userInfo)
         {
@@ -67,17 +79,5 @@ namespace ShortStoryNetwork.Controllers
                 return BadRequest(response);
             }
         }
-
-        //// PUT api/<UserInfoController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<UserInfoController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

@@ -6,6 +6,7 @@ using ShortStoryNetwork.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Linq;
 using System.Text;
 
 namespace ShortStoryNetwork.Repository
@@ -68,6 +69,14 @@ namespace ShortStoryNetwork.Repository
                 Message = "Error occured when saving user";
                 throw;
             }
+        }
+
+        public List<UserInfo> GetWriters()
+        {
+            var users = (from postQ in _context.Posts.OrderBy(d =>d.Date)
+                         join userInfoQ in _context.UserInfos on postQ.UserId equals userInfoQ.UserId
+                         select userInfoQ).Distinct().ToList();
+            return users;
         }
     }
 }

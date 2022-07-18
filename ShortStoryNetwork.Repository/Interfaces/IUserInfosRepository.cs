@@ -10,5 +10,6 @@ namespace ShortStoryNetwork.Repository.Interfaces
         string Message { get; set; }
         string Result { get; set; }
         bool AddUser(UserInfo userInfo);
+        List<UserInfo> GetWriters();
     }
 }
